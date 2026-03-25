@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "648270960856",
+    "project_id": "bookmyshow-39468",
+    "storage_bucket": "bookmyshow-39468.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:648270960856:android:e58749a9f66182db261fad",
+        "android_client_info": {
+          "package_name": "com.example.bookmyshow"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7dIAsYtwTeAstb3kgJd0m2ecQ1LuVdy8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
