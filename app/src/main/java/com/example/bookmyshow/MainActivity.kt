@@ -1,5 +1,6 @@
 package com.example.bookmyshow
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -49,7 +50,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             BookMyShowTheme {
                 val navController = rememberNavController()
-                AppNavGraph(navController = navController, auth = auth)
+                AppNavGraph(
+                    navController = navController,
+                    auth = auth,
+                    mainActivity = this
+                )
             }
         }
     }
@@ -58,37 +63,43 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNavGraph(
     navController: NavHostController,
-    auth: FirebaseAuth
+    auth: FirebaseAuth,
+    mainActivity: MainActivity
 ) {
     NavHost(
         navController = navController,
         startDestination = "splash"
     ) {
-
         composable("splash") {
             SplashScreen(
                 onFinished = {
                     val currentUser = auth.currentUser
 
                     if (currentUser != null) {
-                        navController.navigate("home") {
-                            popUpTo("splash") { inclusive = true }
-                        }
+                        navController.navigate("home")
                     } else {
-                        navController.navigate("login") {
-                            popUpTo("splash") { inclusive = true }
-                        }
+                        navController.navigate("login")
                     }
                 }
             )
         }
 
         composable("login") {
-            SigninScreen(navController = navController)
+            LaunchedEffect(Unit) {
+                mainActivity.startActivity(
+                    Intent(mainActivity, SignInActivity::class.java)
+                )
+                mainActivity.finish()
+            }
         }
 
         composable("home") {
-            HomeScreen(navController = navController)
+            LaunchedEffect(Unit) {
+                mainActivity.startActivity(
+                    Intent(mainActivity, HomeActivity::class.java)
+                )
+                mainActivity.finish()
+            }
         }
     }
 }
