@@ -1,6 +1,5 @@
 package com.example.bookmyshow
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -25,11 +24,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -50,55 +49,68 @@ class MainActivity : ComponentActivity() {
         setContent {
             BookMyShowTheme {
                 val navController = rememberNavController()
-                AppNavGraph(
+
+                NavHost(
                     navController = navController,
-                    auth = auth,
-                    mainActivity = this
-                )
-            }
-        }
-    }
-}
+                    startDestination = "splash"
+                ) {
 
-@Composable
-fun AppNavGraph(
-    navController: NavHostController,
-    auth: FirebaseAuth,
-    mainActivity: MainActivity
-) {
-    NavHost(
-        navController = navController,
-        startDestination = "splash"
-    ) {
-        composable("splash") {
-            SplashScreen(
-                onFinished = {
-                    val currentUser = auth.currentUser
+                    composable("splash") {
+                        SplashScreen(
+                            onFinished = {
+                                if (auth.currentUser != null) {
+                                    navController.navigate("home") {
+                                        popUpTo("splash") { inclusive = true }
+                                    }
+                                } else {
+                                    navController.navigate("login") {
+                                        popUpTo("splash") { inclusive = true }
+                                    }
+                                }
+                            }
+                        )
+                    }
 
-                    if (currentUser != null) {
-                        navController.navigate("home")
-                    } else {
-                        navController.navigate("login")
+                    composable("login") {
+                        SignInScreen(
+                            auth = auth,
+                            onLoginSuccess = {
+                                navController.navigate("home") {
+                                    popUpTo("login") { inclusive = true }
+                                }
+                            },
+                            onGoToSignUp = {
+                                navController.navigate("signup")
+                            }
+                        )
+                    }
+
+                    composable("signup") {
+                        SignUpScreen(
+                            auth = auth,
+                            onSignUpSuccess = {
+                                navController.navigate("login") {
+                                    popUpTo("signup") { inclusive = true }
+                                }
+                            },
+                            onBackToLogin = {
+                                navController.popBackStack()
+                            }
+                        )
+                    }
+
+                    composable("home") {
+                        HomeScreen(
+                            auth = auth,
+                            onLogout = {
+                                auth.signOut()
+                                navController.navigate("login") {
+                                    popUpTo("home") { inclusive = true }
+                                }
+                            }
+                        )
                     }
                 }
-            )
-        }
-
-        composable("login") {
-            LaunchedEffect(Unit) {
-                mainActivity.startActivity(
-                    Intent(mainActivity, SignInActivity::class.java)
-                )
-                mainActivity.finish()
-            }
-        }
-
-        composable("home") {
-            LaunchedEffect(Unit) {
-                mainActivity.startActivity(
-                    Intent(mainActivity, HomeActivity::class.java)
-                )
-                mainActivity.finish()
             }
         }
     }
@@ -107,6 +119,14 @@ fun AppNavGraph(
 @Composable
 fun SplashScreen(onFinished: () -> Unit) {
     var visible by remember { mutableStateOf(false) }
+
+    val gradientBrush = Brush.verticalGradient(
+        colors = listOf(
+            Color(0xFF7B1FA2),
+            Color(0xFFB71C1C),
+            Color(0xFFE53935)
+        )
+    )
 
     LaunchedEffect(Unit) {
         visible = true
@@ -117,7 +137,7 @@ fun SplashScreen(onFinished: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFB71C1C)),
+            .background(gradientBrush),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -129,26 +149,26 @@ fun SplashScreen(onFinished: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Book My Show",
+                    text = "🎬 Book My Show",
                     color = Color.White,
                     fontSize = 34.sp,
                     fontWeight = FontWeight.Bold
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 Text(
-                    text = "Movie Ticket Booking App",
+                    text = "Your Movie Ticket Booking App",
                     color = Color.White.copy(alpha = 0.9f),
                     fontSize = 16.sp
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(28.dp))
 
         CircularProgressIndicator(
-            modifier = Modifier.size(48.dp),
+            modifier = Modifier.size(50.dp),
             color = Color.White,
             strokeWidth = 4.dp
         )
