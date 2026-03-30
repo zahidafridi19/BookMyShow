@@ -1,11 +1,6 @@
 package com.example.bookmyshow
 
-import android.content.Intent
-import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -20,37 +15,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.bookmyshow.ui.theme.BookMyShowTheme
+import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
-
-class SignInActivity : ComponentActivity() {
-
-    private lateinit var auth: FirebaseAuth
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-
-        auth = FirebaseAuth.getInstance()
-
-        setContent {
-            BookMyShowTheme {
-                SignInScreen(
-                    auth = auth,
-                    onLoginSuccess = {
-                        startActivity(Intent(this, HomeActivity::class.java))
-                        finish()
-                    }
-                )
-            }
-        }
-    }
-}
 
 @Composable
 fun SignInScreen(
     auth: FirebaseAuth,
-    onLoginSuccess: () -> Unit
+    onLoginSuccess: () -> Unit,
+    onGoToSignUp: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -144,7 +116,7 @@ fun SignInScreen(
                         ).addOnCompleteListener { task ->
                             isLoading = false
                             if (task.isSuccessful) {
-                                onLoginSuccess()
+                                onLoginSuccess() //  NAVIGATION handled in MainActivity
                             } else {
                                 errorMessage =
                                     task.exception?.message ?: "Login failed"
@@ -178,20 +150,7 @@ fun SignInScreen(
 
                 TextButton(
                     onClick = {
-                        if (email.isNotBlank() && password.isNotBlank()) {
-                            auth.createUserWithEmailAndPassword(
-                                email.trim(),
-                                password.trim()
-                            ).addOnCompleteListener {
-                                Toast.makeText(
-                                    auth.app.applicationContext,
-                                    "Account Created! Please login.",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        } else {
-                            errorMessage = "Enter email & password to register"
-                        }
+                        onGoToSignUp() //  navigate to signup
                     }
                 ) {
                     Text("New user? Register here")

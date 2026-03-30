@@ -1,11 +1,5 @@
 package com.example.bookmyshow
 
-import android.content.Intent
-import android.os.Bundle
-import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,7 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,47 +32,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.bookmyshow.ui.theme.BookMyShowTheme
 import com.google.firebase.auth.FirebaseAuth
-
-class SinUpActivity : ComponentActivity() {
-
-    private lateinit var auth: FirebaseAuth
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-
-        auth = FirebaseAuth.getInstance()
-
-        setContent {
-            BookMyShowTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    SignUpScreen(
-                        auth = auth,
-                        onSignUpSuccess = {
-                            Toast.makeText(
-                                this,
-                                "Account created successfully",
-                                Toast.LENGTH_SHORT
-                            ).show()
-
-                            startActivity(Intent(this, SignInActivity::class.java))
-                            finish()
-                        },
-                        onBackToLogin = {
-                            startActivity(Intent(this, SignInActivity::class.java))
-                            finish()
-                        }
-                    )
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun SignUpScreen(

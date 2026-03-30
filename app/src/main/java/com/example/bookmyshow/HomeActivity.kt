@@ -1,9 +1,5 @@
 package com.example.bookmyshow
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,20 +25,19 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,7 +49,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.bookmyshow.ui.theme.BookMyShowTheme
 import com.google.firebase.auth.FirebaseAuth
 
 data class Movie(
@@ -64,47 +58,20 @@ data class Movie(
     val price: Int
 )
 
-class HomeActivity : ComponentActivity() {
-
-    private lateinit var auth: FirebaseAuth
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-
-        auth = FirebaseAuth.getInstance()
-
-        setContent {
-            BookMyShowTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    HomeNavGraph(
-                        auth = auth,
-                        onLogout = {
-                            auth.signOut()
-                            finish()
-                        }
-                    )
-                }
-            }
-        }
-    }
-}
-
 @Composable
-fun HomeNavGraph(
+fun HomeScreen(
     auth: FirebaseAuth,
     onLogout: () -> Unit
 ) {
     val navController = rememberNavController()
 
-    val movies = listOf(
-        Movie(1, "Leo", "Action / Thriller", 250),
-        Movie(2, "Jawan", "Action / Drama", 300),
-        Movie(3, "Kalki 2898 AD", "Sci-Fi / Action", 350)
-    )
+    val movies = remember {
+        listOf(
+            Movie(1, "Leo", "Action / Thriller", 250),
+            Movie(2, "Jawan", "Action / Drama", 300),
+            Movie(3, "Kalki 2898 AD", "Sci-Fi / Action", 350)
+        )
+    }
 
     NavHost(
         navController = navController,
@@ -115,9 +82,7 @@ fun HomeNavGraph(
                 auth = auth,
                 movies = movies,
                 onMovieSelected = { movie ->
-                    navController.navigate(
-                        "seat_selection/${movie.id}"
-                    )
+                    navController.navigate("seat_selection/${movie.id}")
                 },
                 onLogout = onLogout
             )
@@ -130,7 +95,7 @@ fun HomeNavGraph(
             )
         ) { backStackEntry ->
             val movieId = backStackEntry.arguments?.getInt("movieId") ?: 1
-            val selectedMovie = movies.first { it.id == movieId }
+            val selectedMovie = movies.firstOrNull { it.id == movieId } ?: movies.first()
 
             SeatSelectionScreen(
                 movie = selectedMovie,
@@ -150,7 +115,7 @@ fun HomeNavGraph(
         ) { backStackEntry ->
             val movieId = backStackEntry.arguments?.getInt("movieId") ?: 1
             val seatCount = backStackEntry.arguments?.getInt("seatCount") ?: 1
-            val selectedMovie = movies.first { it.id == movieId }
+            val selectedMovie = movies.firstOrNull { it.id == movieId } ?: movies.first()
 
             PaymentScreen(
                 movie = selectedMovie,
@@ -415,7 +380,7 @@ fun SeatSelectionScreen(
                     Text("Seats: $seatCount")
                     Text("Price per seat: ₹${movie.price}")
                     Spacer(modifier = Modifier.height(8.dp))
-                    Divider()
+                    HorizontalDivider()
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Total Price: ₹$totalPrice",

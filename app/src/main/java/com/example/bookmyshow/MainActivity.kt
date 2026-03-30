@@ -54,7 +54,6 @@ class MainActivity : ComponentActivity() {
                     navController = navController,
                     startDestination = "splash"
                 ) {
-
                     composable("splash") {
                         SplashScreen(
                             onFinished = {
@@ -91,6 +90,7 @@ class MainActivity : ComponentActivity() {
                             onSignUpSuccess = {
                                 navController.navigate("login") {
                                     popUpTo("signup") { inclusive = true }
+                                    launchSingleTop = true
                                 }
                             },
                             onBackToLogin = {
